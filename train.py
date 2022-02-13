@@ -31,9 +31,8 @@ def main(config):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-    # load and split data into trainset and validset by valid_split
-    fullset = config.init_obj('dataset', dataset)
-    trainset, ph1 = random_split(fullset, config['dataset']['valid_split']) # placeholder
+    # load trainset and validset
+    trainset = config.init_obj('train_dataset', dataset)
     validset = config.init_obj('valid_dataset', dataset)
     trainloader = config.init_obj('dataloader', dataloader, trainset)
     if validset is None:
