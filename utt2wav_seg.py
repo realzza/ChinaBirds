@@ -13,12 +13,16 @@ for bird in tqdm(all_birds):
     all_records += [database+bird+'/'+rec for rec in os.listdir(database+bird) if rec.endswith('.wav')]
 
 # tag starting point
-tagged_recordings = []
+tagged_utt2wav = []
+tagged_utt2label = []
 for rec in tqdm(all_records):
     rec_len = sox.file_info.duration(rec)
     if rec_len > 5:
         max_start = int(rec_len) - 4
-        tagged_recordings += [rec.split('/')[-1].split('.')[0] + ' ' + rec + ' %d'%i for i in range(max_start)]
-
+        tagged_utt2wav += [rec.split('/')[-1].split('.')[0] + '_%d '%i + rec + ' %d'%i for i in range(max_start)]
+        tagged_utt2label += [rec.split('/')[-1].split('.')[0] + '_%d '%i + rec.split('/')[-2] for i in range(max_start)]
+        
 with open('index/utt2wav_id','w') as f:
-    f.write('\n'.join(tagged_recordings))
+    f.write('\n'.join(tagged_utt2wav))
+with open('index/utt2label_id','w') as f:
+    f.write('\n'.join(tagged_utt2label))
