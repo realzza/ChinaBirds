@@ -11,6 +11,8 @@ def parse_args():
     parser.add_argument('--dataDir', type=str, default=None, help="path to the input dir")
     parser.add_argument('--outDir', type=str, default=None, help="path to the output dir")
     parser.add_argument('--process', type=int, default=20, help="number of process running")
+    parser.add_argument('--test-size', type=float, default=0.1, help="ratio of test set from all")
+    parser.add_argument('--isTrain', action='store_true', default=False, help="parse the train dataset")
     return parser.parse_args()
 
 
@@ -54,12 +56,22 @@ if __name__ == '__main__':
     args = parse_args()
     dataDir = args.dataDir
     allClips = []
-    with open('class2weight.json','r') as f:
+    with open('class2count.json','r') as f:
         all_birds = list(json.load(f).keys())
-    for bird in all_birds:
-        tmpClips = os.listdir(dataDir+bird)
-        allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
         
+    # train/test set
+    if args.isTrain:
+        for bird in all_birds:
+            tmpClips = os.listdir(dataDir+bird)
+            tmpClips = tmpClips[int(args.test_size*len(tmpClips)):]
+            allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
+    else:
+        for bird in all_birds:
+            tmpClips = os.listdir(dataDir+bird)
+            tmpClips = tmpClips[:int(args.test_size*len(tmpClips))]
+            allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
+        
+    
     # init output directories
     outDir = args.outDir.strip('/') + '/'
     if not os.path.isdir(outDir):
