@@ -1,4 +1,5 @@
 import json
+from torch import DoubleTensor
 from .sampler import TruncateBatchSampler
 from .collate import PadCollate
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler, WeightedRandomSampler
@@ -21,15 +22,15 @@ class WeightedDataLoader(DataLoader):
     def __init__(self, dataset, weight_path,
                  shuffle=False, batch_size=1, num_workers=0, drop_last=False, pin_memory=True):
         self.dataset = dataset
-        with open(weighted_sampler,'r') as f:
-            self.sampler_weights = json.load(f)
-        self.sampler_weights = torch.DoubleTensor(self.sampler_weights)  
+        with open(weight_path,'r') as f:
+            self.sampler_weights = list(json.load(f).values())
+        self.sampler_weights = DoubleTensor(self.sampler_weights)  
         self.sampler = WeightedRandomSampler(self.sampler_weights, len(self.sampler_weights))
         super().__init__(self.dataset,
-                         batch_sampler=self.sampler,
+                         sampler=self.sampler,
                          batch_size=batch_size,
                          num_workers=num_workers,
-                         shuffle=shuffle,
+#                          shuffle=shuffle,
                          drop_last=drop_last,
                          pin_memory=pin_memory)
 
