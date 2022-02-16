@@ -35,10 +35,7 @@ def main(config):
     trainset = config.init_obj('train_dataset', dataset)
     validset = config.init_obj('valid_dataset', dataset)
     trainloader = config.init_obj('dataloader', dataloader, trainset)
-    if validset is None:
-        validloader = None
-    else:
-        validloader = config.init_obj('dataloader', dataloader, validset)
+    validloader = config.init_obj('dataloader', dataloader, validset)
 
     # build model architecture, then print to console
     model = config.init_obj('model', module_model)

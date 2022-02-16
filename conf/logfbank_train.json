@@ -1,0 +1,94 @@
+{
+    "name": "vox1", 
+    "seed": 4,
+    "GPUtil": {
+        "type": "getAvailable",
+        "args": {
+            "limit": 3,
+            "maxMemory": 1.1,
+            "maxLoad": 0.1
+        }
+    },
+    "trainer": {
+        "epochs": 80, 
+        "early_stop": 30,
+        "log_step": 22,
+        "save_dir": "exp/",
+        "save_period": 5,
+        "verbosity": 1,
+        "monitor": "min valid_loss",
+        "tensorboard": false
+    }, 
+    "train_dataset": {
+        "type": "LogfbankDataset",
+        "args": {
+            "wav_scp": "index/utt2wav_train_h5",
+            "utt2label": "index/utt2label_train",
+            "spk2int": "index/label2int.json",
+            "samplerate": 16000,
+            "padding": "wrap",
+            "cmn": true,
+            "tdur": 5,
+            "pad0": false
+        }
+    },
+    "valid_dataset": {
+        "type": "LogfbankDataset",
+        "args": {
+            "wav_scp": "index/utt2wav_eval_h5",
+            "utt2label": "index/utt2label_eval",
+            "spk2int": "index/label2int.json",
+            "samplerate": 16000,
+            "padding": "wrap",
+            "cmn": true,
+            "tdur": 5,
+            "pad0": false
+        }
+    },
+    "dataloader": {
+        "type": "SimpleDataLoader",
+        "args": {
+            "batch_size": 256,
+            "shuffle": true,
+            "num_workers": 16,
+            "drop_last": false
+        }
+    },
+    "optimizer": {
+        "type": "SGD",
+        "args": {
+            "lr": 1e-2,
+            "momentum": 0.9,
+            "weight_decay": 1e-4
+        }
+    },
+    "lr_scheduler": {
+        "type": "ReduceLROnPlateau",
+        "args": {
+            "mode": "min",
+            "patience": 9,
+            "verbose": true
+        }
+    },
+    "loss": {
+        "type": "CrossEntropyLoss",
+        "args": {}
+    },
+    "metrics": [
+        "accuracy",
+        "uar"
+    ], 
+    "model": {
+        "type": "Gvector",
+        "args": {
+            "channels": 16,
+            "block": "BasicBlock", 
+            "num_blocks": [
+                2,2,2,2
+            ],
+            "embd_dim": 1024,
+            "drop": 0.3, 
+            "n_class": 7
+        }
+    }
+}
