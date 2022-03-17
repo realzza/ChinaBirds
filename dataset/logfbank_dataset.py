@@ -11,7 +11,7 @@ from python_speech_features import logfbank
 
 
 class LogfbankDataset(Dataset):
-    def __init__(self, wav_scp, utt2label=None, spk2int=None, sample_rate={}, padding="wrap", cmn=True, tdur=5, pad0=False):
+    def __init__(self, wav_scp, utt2label=None, spk2int=None, samplerate=None, padding="wrap", cmn=True, tdur=5, pad0=False):
         """
         Params:
             wav_scp         - <utt> <wavpath>
@@ -22,10 +22,10 @@ class LogfbankDataset(Dataset):
             cmn             - whether perform mean normalization for feats.
             tdur            - time duration of each utterance
         """    
-        self.utt2wavpath = {x.split()[0]:(x.split()[1], x.split()[2]) for x in open(wav_scp)} # utt: (wav, t_start)
+        self.utt2wavpath = {x.split()[0]:(x.split()[1], int(x.split()[2])) for x in open(wav_scp)} # utt: (wav, t_start)
         self.utt2label = self.init_label(utt2label, spk2int)
         self.utts = sorted(list(self.utt2wavpath.keys()))
-        self.sample_rate = sample_rate
+        self.sample_rate = samplerate
         self.padding = 'wrap' if padding == "wrap" else 'constant'
         self.cmn = cmn
         self.len = len(self.utts)
@@ -68,8 +68,8 @@ class LogfbankDataset(Dataset):
             return y
     
     def tailor_feature(self, y, t_dur, t_start):
-        y = y[t_start*100:t_dur]
-        return y
+        y = y[t_start*100:t_start*100+t_dur]
+        return np.resize(y, (500,80))
 
 
     def extract_feature(self, h5Dir):
@@ -88,7 +88,7 @@ class LogfbankDataset(Dataset):
             index, tlen = sample_idx
         else:
             raise AssertionError
-        
+            
         utt = self.utts[index]
         feat = self.extract_feature(self.utt2wavpath[utt])
         label = self.utt2label[utt]
