@@ -7,3 +7,6 @@ kill_label.sh
 bad_file
 */.ipynb_checkpoints/
 */__pycache__
+index
+exp/
+kill.sh
