@@ -1,6 +1,7 @@
 import os
 import sox
 import json
+import random
 import argparse
 from tqdm import tqdm
 from multiprocessing import Process
@@ -11,7 +12,9 @@ def parse_args():
     parser.add_argument('--dataDir', type=str, default=None, help="path to the input dir")
     parser.add_argument('--outDir', type=str, default=None, help="path to the output dir")
     parser.add_argument('--process', type=int, default=20, help="number of process running")
-    parser.add_argument('--test-size', type=float, default=0.1, help="ratio of test set from all")
+    parser.add_argument('--test-size', type=float, default=0.15, help="ratio of test set from all")
+    parser.add_argument('--threshold', type=int, default=1000, help="threshold of data of each class")
+    parser.add_argument('--class2count', type=str, default="class2count.json", help="class2count json file")
     parser.add_argument('--isTrain', action='store_true', default=False, help="parse the train dataset")
     return parser.parse_args()
 
@@ -56,18 +59,24 @@ if __name__ == '__main__':
     args = parse_args()
     dataDir = args.dataDir
     allClips = []
-    with open('class2count.json','r') as f:
+    with open('class2count_503.json','r') as f:
         all_birds = list(json.load(f).keys())
         
     # train/test set
     if args.isTrain:
         for bird in all_birds:
             tmpClips = os.listdir(dataDir+bird)
+            if len(tmpClips) > args.threshold:
+                random.seed(42)
+                tmpClips = random.sample(os.listdir(dataDir+bird), args.threshold)
             tmpClips = tmpClips[int(args.test_size*len(tmpClips)):]
             allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
     else:
         for bird in all_birds:
             tmpClips = os.listdir(dataDir+bird)
+            if len(tmpClips) > args.threshold:
+                random.seed(42)
+                tmpClips = random.sample(os.listdir(dataDir+bird), args.threshold)
             tmpClips = tmpClips[:int(args.test_size*len(tmpClips))]
             allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
         
