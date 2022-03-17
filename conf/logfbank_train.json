@@ -5,26 +5,26 @@
         "type": "getAvailable",
         "args": {
             "limit": 3,
-            "maxMemory": 1.1,
+            "maxMemory": 0.1,
             "maxLoad": 0.1
         }
     },
     "trainer": {
-        "epochs": 80, 
-        "early_stop": 30,
+        "epochs": 200, 
+        "early_stop": 100,
         "log_step": 22,
         "save_dir": "exp/",
-        "save_period": 5,
+        "save_period": 1,
         "verbosity": 1,
-        "monitor": "min valid_loss",
+        "monitor": "max valid_accuracy",
         "tensorboard": false
     }, 
     "train_dataset": {
         "type": "LogfbankDataset",
         "args": {
-            "wav_scp": "index/utt2wav_train_h5",
-            "utt2label": "index/utt2label_train",
-            "spk2int": "index/label2int.json",
+            "wav_scp": "index/utt2wav_train_503_h5",
+            "utt2label": "index/utt2label_train_500",
+            "spk2int": "index/label2int_503.json",
             "samplerate": 16000,
             "padding": "wrap",
             "cmn": true,
@@ -35,9 +35,9 @@
     "valid_dataset": {
         "type": "LogfbankDataset",
         "args": {
-            "wav_scp": "index/utt2wav_eval_h5",
-            "utt2label": "index/utt2label_eval",
-            "spk2int": "index/label2int.json",
+            "wav_scp": "index/utt2wav_devel_503_h5",
+            "utt2label": "index/utt2label_devel_500",
+            "spk2int": "index/label2int_503.json",
             "samplerate": 16000,
             "padding": "wrap",
             "cmn": true,
@@ -48,7 +48,7 @@
     "dataloader": {
         "type": "SimpleDataLoader",
         "args": {
-            "batch_size": 256,
+            "batch_size": 128,
             "shuffle": true,
             "num_workers": 16,
             "drop_last": false
@@ -63,10 +63,10 @@
         }
     },
     "lr_scheduler": {
-        "type": "ReduceLROnPlateau",
+        "type": "CosineAnnealingLR",
         "args": {
-            "mode": "min",
-            "patience": 9,
+            "T_max": 15,
+            "eta_min": 1e-8,
             "verbose": true
         }
     },
@@ -88,7 +88,7 @@
             ],
             "embd_dim": 1024,
             "drop": 0.3, 
-            "n_class": 7
+            "n_class": 503
         }
     }
 }
