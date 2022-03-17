@@ -1,5 +1,4 @@
 argparse
-collections
 torch
 torchaudio
 torchvision
