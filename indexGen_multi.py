@@ -15,11 +15,11 @@ def parse_args():
     parser.add_argument('--test-size', type=float, default=0.15, help="ratio of test set from all")
     parser.add_argument('--threshold', type=int, default=1000, help="threshold of data of each class")
     parser.add_argument('--class2count', type=str, default="class2count.json", help="class2count json file")
-    parser.add_argument('--isTrain', action='store_true', default=False, help="parse the train dataset")
+    parser.add_argument('--isTrain', action='store_true', help="parse the train dataset")
     return parser.parse_args()
 
 
-def gen(pid, nproc, all_records, outDir):
+def gen(pid, nproc, all_records, outDir, isTrain):
     isFirst = True
     
     portion = len(all_records) // nproc
@@ -43,12 +43,18 @@ def gen(pid, nproc, all_records, outDir):
         rec_len = sox.file_info.duration(rec)
         if rec_len > 5:
             max_start = int(rec_len) - 4
-            tagged_utt2wav += [rec.split('/')[-1].split('.')[0] + '_%d '%i + rec + ' %d'%i for i in range(max_start)]
+            tagged_utt2wav += [rec.split('/')[-1].split('.')[0] + '_%d '%i + rec.replace("data-","feats-").replace('.wav','.h5') + ' %d'%i for i in range(max_start)]
             tagged_utt2label += [rec.split('/')[-1].split('.')[0] + '_%d '%i + rec.split('/')[-2] for i in range(max_start)]
-    with open('%sutt2wav_id_%d'%(outDir, pid),'w') as f:
-        f.write('\n'.join(tagged_utt2wav))
-    with open('%sutt2label_id_%d'%(outDir, pid),'w') as f:
-        f.write('\n'.join(tagged_utt2label))
+    
+    if isTrain:
+        sec = 'train'
+    else:
+        sec='devel'
+    
+    with open('%s%s_utt2wav'%(outDir, sec),'a') as f:
+        f.write('\n'.join(tagged_utt2wav)+'\n')
+    with open('%s%s_utt2label'%(outDir, sec),'a') as f:
+        f.write('\n'.join(tagged_utt2label)+'\n')
     
     
 if __name__ == '__main__':
@@ -59,11 +65,16 @@ if __name__ == '__main__':
     args = parse_args()
     dataDir = args.dataDir
     allClips = []
-    with open('class2count_503.json','r') as f:
+    with open(args.class2count,'r') as f:
         all_birds = list(json.load(f).keys())
         
+    
     # train/test set
     if args.isTrain:
+        with open('%strain_utt2wav'%args.outDir,'w') as f:
+            f.write('')
+        with open('%strain_utt2label'%args.outDir,'w') as f:
+            f.write('')
         for bird in all_birds:
             tmpClips = os.listdir(dataDir+bird)
             if len(tmpClips) > args.threshold:
@@ -72,6 +83,10 @@ if __name__ == '__main__':
             tmpClips = tmpClips[int(args.test_size*len(tmpClips)):]
             allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
     else:
+        with open('%sdevel_utt2wav'%args.outDir,'w') as f:
+            f.write('')
+        with open('%sdevel_utt2label'%args.outDir,'w') as f:
+            f.write('')
         for bird in all_birds:
             tmpClips = os.listdir(dataDir+bird)
             if len(tmpClips) > args.threshold:
@@ -90,7 +105,7 @@ if __name__ == '__main__':
     worker_count = args.process
     worker_pool = []
     for i in range(worker_count):
-        p = Process(target=gen, args=(i, worker_count, allClips, outDir))
+        p = Process(target=gen, args=(i, worker_count, allClips, outDir, args.isTrain))
         p.start()
         worker_pool.append(p)
     for p in worker_pool:
