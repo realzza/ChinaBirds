@@ -18,6 +18,7 @@ def parse_args():
     parser.add_argument('--threshold', type=int, default=1000, help="number of samples from each wav file")
     parser.add_argument('--class2count', type=str, default="class2count.json", help="class2count json file")
     parser.add_argument('--isTrain', action='store_true', help="parse the train dataset")
+    parser.add_argument('--id', type=str, default="", help="id for your index files")
     return parser.parse_args()
 
 def get_floor(x, n):
@@ -61,9 +62,9 @@ def gen(pid, args, all_records, class2nsample):
     else:
         sec='devel'
     
-    with open('%s%s_utt2wav'%(outDir, sec),'a') as f:
+    with open('%s%s_utt2wav_%s'%(outDir, sec, args.id),'a') as f:
         f.write('\n'.join(tagged_utt2wav)+'\n')
-    with open('%s%s_utt2label'%(outDir, sec),'a') as f:
+    with open('%s%s_utt2label_%s'%(outDir, sec, args.id),'a') as f:
         f.write('\n'.join(tagged_utt2label)+'\n')
     
     
@@ -87,9 +88,9 @@ if __name__ == '__main__':
     
     # train/test set
     if args.isTrain:
-        with open('%strain_utt2wav'%outDir,'w') as f:
+        with open('%strain_utt2wav_%s'%(outDir, args.id),'w') as f:
             f.write('')
-        with open('%strain_utt2label'%outDir,'w') as f:
+        with open('%strain_utt2label_%s'%(outDir, args.id),'w') as f:
             f.write('')
         for bird in all_birds:
             tmpClips = os.listdir(dataDir+bird)
@@ -99,9 +100,9 @@ if __name__ == '__main__':
             tmpClips = tmpClips[int(args.test_size*len(tmpClips)):]
             allClips += [dataDir + bird + '/' + x for x in tmpClips if x.endswith('mp3') or x.endswith('wav')]
     else:
-        with open('%sdevel_utt2wav'%outDir,'w') as f:
+        with open('%sdevel_utt2wav_%s'%(outDir, args.id),'w') as f:
             f.write('')
-        with open('%sdevel_utt2label'%outDir,'w') as f:
+        with open('%sdevel_utt2label_%s'%(outDir, args.id),'w') as f:
             f.write('')
         for bird in all_birds:
             tmpClips = os.listdir(dataDir+bird)
