@@ -10,3 +10,6 @@ bad_file
 index
 exp/
 kill.sh
+module/loss/__pycache__/
+module/metric/__pycache__/
+module/model/__pycache__/
