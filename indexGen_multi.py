@@ -15,7 +15,11 @@ def parse_args():
     parser.add_argument('--outDir', type=str, default=None, help="path to the output dir")
     parser.add_argument('--process', type=int, default=20, help="number of process running")
     parser.add_argument('--test-size', type=float, default=0.15, help="ratio of test set from all")
+<<<<<<< HEAD
     parser.add_argument('--threshold', type=int, default=1000, help="length of each species")
+=======
+    parser.add_argument('--threshold', type=int, default=1000, help="number of samples from each wav file")
+>>>>>>> 2bb296d683d5820181f6fdfe02e0e7a68e997b52
     parser.add_argument('--class2count', type=str, default="class2count.json", help="class2count json file")
     parser.add_argument('--isTrain', action='store_true', help="parse the train dataset")
     parser.add_argument('--id', type=str, default="", help="id for your index files")
