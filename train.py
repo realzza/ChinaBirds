@@ -44,11 +44,11 @@ def main(config):
     model = config.init_obj('model', module_model)
         
     # get function handles of loss and metrics
-    if len(config['loss']['args'])>0:
-        print('... loading weighted loss params ...')
-        criterion = torch.nn.CrossEntropyLoss(weight=torch.FloatTensor(config['loss']['args']['weight']).cuda())
-    else:
-        criterion = config.init_obj('loss', module_loss)
+#     if len(config['loss']['args'])>0:
+#         print('... loading weighted loss params ...')
+#         criterion = torch.nn.CrossEntropyLoss(weight=torch.FloatTensor(config['loss']['args']['weight']).cuda())
+#     else:
+    criterion = config.init_obj('loss', module_loss)
     metrics = [getattr(module_metric, met) for met in config['metrics']]
 
     # build optimizer, learning rate scheduler. delete every lines containing lr_scheduler for disabling scheduler
