@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from sklearn.metrics import auc, roc_curve, roc_auc_score, recall_score, classification_report
 
-def accuracy(output, target):
+def acc(output, target):
     with torch.no_grad():
         pred = torch.argmax(output, dim=1)
         assert pred.shape[0] == len(target)
@@ -18,7 +18,7 @@ def uar(output, target):
 #     print(cf_report(output, target))
     return uar   
 
-def top_k_acc(output, target, k=3):
+def top_3_acc(output, target, k=3):
     with torch.no_grad():
         pred = torch.topk(output, k, dim=1)[1]
         assert pred.shape[0] == len(target)

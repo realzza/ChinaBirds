@@ -22,7 +22,7 @@ class LogfbankDataset(Dataset):
             cmn             - whether perform mean normalization for feats.
             tdur            - time duration of each utterance
         """    
-        self.utt2wavpath = {x.split()[0]:(x.split()[1], int(x.split()[2])) for x in open(wav_scp)} # utt: (wav, t_start)
+        self.utt2wavpath = {x.split()[0]:(x.split()[1], float(x.split()[2])) for x in open(wav_scp)} # utt: (wav, t_start)
         self.utt2label = self.init_label(utt2label, spk2int)
         self.utts = sorted(list(self.utt2wavpath.keys()))
         self.sample_rate = samplerate
@@ -68,7 +68,7 @@ class LogfbankDataset(Dataset):
             return y
     
     def tailor_feature(self, y, t_dur, t_start):
-        y = y[t_start*100:t_start*100+t_dur]
+        y = y[int(t_start*100):int(t_start*100)+t_dur]
         return np.resize(y, (500,80))
 
 
